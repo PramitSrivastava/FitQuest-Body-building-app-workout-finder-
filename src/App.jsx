@@ -8,6 +8,7 @@ import Footer from './components/Footer';
 
 const App = () => {
   const [selectedBodyPart, setSelectedBodyPart] = useState('');
+  const [difficulty, setDifficulty] = useState('All'); // Add difficulty state
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(true); // Set dark mode to true by default
   const [myExercises, setMyExercises] = useState([]);
@@ -31,6 +32,8 @@ const App = () => {
       <RoutesWrapper
         selectedBodyPart={selectedBodyPart}
         setSelectedBodyPart={setSelectedBodyPart}
+        difficulty={difficulty} // Pass difficulty state
+        setDifficulty={setDifficulty} // Pass setDifficulty function
         myExercises={myExercises}
         setMyExercises={setMyExercises}
         addedExercises={addedExercises}
@@ -47,6 +50,8 @@ const App = () => {
 const RoutesWrapper = ({
   selectedBodyPart,
   setSelectedBodyPart,
+  difficulty,
+  setDifficulty,
   myExercises,
   setMyExercises,
   addedExercises,
@@ -75,6 +80,8 @@ const RoutesWrapper = ({
                 <SelectedBodyPart
                   selectedBodyPart={selectedBodyPart}
                   setSelectedBodyPart={setSelectedBodyPart}
+                  difficulty={difficulty} // Pass difficulty state to SelectedBodyPart
+                  setDifficulty={setDifficulty} // Pass setDifficulty function
                   myExercises={myExercises}
                   setMyExercises={setMyExercises}
                   addedExercises={addedExercises}

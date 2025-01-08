@@ -13,8 +13,8 @@ const SelectedBodyPart = ({ selectedBodyPart, setSelectedBodyPart, myExercises, 
         try {
           const response = await axios.get(`https://exercisedb.p.rapidapi.com/exercises/bodyPart/${selectedBodyPart}`, {
             headers: {
-              'X-RapidAPI-Key': '86e7f2ed69mshec33da2e64f7f2fp102a12jsn849c12bd2bfa',
-              'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com',
+              'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY,
+              'X-RapidAPI-Host': import.meta.env.VITE_RAPIDAPI_HOST,
             },
           });
           setExercises(response.data);

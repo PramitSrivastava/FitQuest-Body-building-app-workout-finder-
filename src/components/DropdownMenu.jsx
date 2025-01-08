@@ -14,8 +14,8 @@ const DropdownMenu = ({ setSearch }) => {
           method: 'GET',
           url: 'https://exercisedb.p.rapidapi.com/exercises/bodyPartList',
           headers: {
-            'X-RapidAPI-Key': '86e7f2ed69mshec33da2e64f7f2fp102a12jsn849c12bd2bfa',
-            'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com',
+            'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY,
+            'X-RapidAPI-Host': import.meta.env.VITE_RAPIDAPI_HOST,
           },
         };
         const response = await axios.request(options);
