@@ -5,6 +5,7 @@ import MyExercises from './components/MyExercises';
 import LandingPage from './components/LandingPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import HealthHub from './components/HealthHub';
 
 const App = () => {
   const [selectedBodyPart, setSelectedBodyPart] = useState('');
@@ -107,6 +108,8 @@ const RoutesWrapper = ({
                 />
               }
             />
+            
+          <Route path="/health-hub" element={<HealthHub />} />
           </Routes>
         </div>
       </main>

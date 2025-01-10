@@ -44,22 +44,32 @@ const SelectedBodyPart = ({ selectedBodyPart, setSelectedBodyPart, myExercises, 
   };
 
   return (
-    <div>
-      <div className="flex justify-center mb-6">
-        <DropdownMenu setSearch={setSelectedBodyPart} />
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="w-12 h-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin"></div>
+    <div className="bg-gradient-to-r from-indigo-500 via-blue-400 to-purple-600 min-h-screen py-12">
+      <div className="max-w-6xl mx-auto text-center text-white">
+        <h2 className="text-4xl font-extrabold mb-8">Select Body Part</h2>
+        
+        <div className="mb-8">
+          <DropdownMenu setSearch={setSelectedBodyPart} />
         </div>
-      ) : (
-        <ExercisesList
-          exercises={exercises}
-          onAddToMyExercises={handleAddToMyExercises}
-          addedExercises={addedExercises} // Pass added exercises to highlight the cards
-        />
-      )}
+
+        {loading ? (
+          <div className="flex justify-center items-center min-h-screen">
+            <div className="w-12 h-12 border-4 border-t-4 border-blue-500 rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <>
+            {exercises.length === 0 ? (
+              <p className="text-xl font-semibold text-gray-300">No exercises found for the selected body part.</p>
+            ) : (
+              <ExercisesList
+                exercises={exercises}
+                onAddToMyExercises={handleAddToMyExercises}
+                addedExercises={addedExercises} // Pass added exercises to highlight the cards
+              />
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

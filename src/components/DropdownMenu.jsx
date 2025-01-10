@@ -42,7 +42,7 @@ const DropdownMenu = ({ setSearch }) => {
     <div className="relative inline-block w-48 ">
       <select
         onChange={handleChange}
-        className="block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none"
+        className="block w-full px-4 py-2 bg-white border text-black border-gray-300 rounded-md shadow-sm focus:outline-none"
       >
         <option value="">Select a body part</option>
         {bodyParts.map((bodyPart, index) => (
