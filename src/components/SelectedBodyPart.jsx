@@ -47,7 +47,7 @@ const SelectedBodyPart = ({ selectedBodyPart, setSelectedBodyPart, myExercises, 
     <div className="bg-gradient-to-r from-indigo-500 via-blue-400 to-purple-600 min-h-screen py-12">
       <div className="max-w-6xl mx-auto text-center text-white">
         <h2 className="text-4xl font-extrabold mb-8">Select Body Part</h2>
-        
+
         <div className="mb-8">
           <DropdownMenu setSearch={setSelectedBodyPart} />
         </div>

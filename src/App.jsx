@@ -1,40 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import SelectedBodyPart from './components/SelectedBodyPart';
-import MyExercises from './components/MyExercises';
-import LandingPage from './components/LandingPage';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import HealthHub from './components/HealthHub';
+// App.jsx
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
+import SelectedBodyPart from "./components/SelectedBodyPart";
+import MyExercises from "./components/MyExercises";
+import LandingPage from "./components/LandingPage";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import HealthHub from "./components/HealthHub";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import { fetchMessage } from "./api";
 
 const App = () => {
-  const [selectedBodyPart, setSelectedBodyPart] = useState('');
-  const [difficulty, setDifficulty] = useState('All'); // Add difficulty state
+  const [selectedBodyPart, setSelectedBodyPart] = useState("");
+  const [difficulty, setDifficulty] = useState("All");
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(true); // Set dark mode to true by default
+  const [darkMode, setDarkMode] = useState(true);
   const [myExercises, setMyExercises] = useState([]);
   const [addedExercises, setAddedExercises] = useState([]);
+  const [message, setMessage] = useState("");
+  const [search, setSearch] = useState(""); // Search state added
 
-  // When the app starts, check localStorage for saved darkMode preference
   useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode');
+    const savedDarkMode = localStorage.getItem("darkMode");
     if (savedDarkMode !== null) {
-      setDarkMode(JSON.parse(savedDarkMode)); // Use the saved value if it exists
+      setDarkMode(JSON.parse(savedDarkMode));
     }
   }, []);
 
-  // Persist darkMode state to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await fetchMessage();
+      setMessage(data.message);
+    };
+    getData();
+  }, []);
 
   return (
     <Router>
       <RoutesWrapper
         selectedBodyPart={selectedBodyPart}
         setSelectedBodyPart={setSelectedBodyPart}
-        difficulty={difficulty} // Pass difficulty state
-        setDifficulty={setDifficulty} // Pass setDifficulty function
+        difficulty={difficulty}
+        setDifficulty={setDifficulty}
         myExercises={myExercises}
         setMyExercises={setMyExercises}
         addedExercises={addedExercises}
@@ -43,6 +60,9 @@ const App = () => {
         setLoading={setLoading}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        message={message}
+        search={search} // Pass search state to RoutesWrapper
+        setSearch={setSearch} // Pass setSearch to RoutesWrapper
       />
     </Router>
   );
@@ -61,37 +81,48 @@ const RoutesWrapper = ({
   setLoading,
   darkMode,
   setDarkMode,
+  message,
+  search,
+  setSearch,
 }) => {
   const location = useLocation();
-  const isLandingPage = location.pathname === '/';
+  const isLandingPage = location.pathname === "/";
 
   return (
-    <div className={`flex flex-col min-h-screen ${darkMode ? 'bg-black text-black' : 'bg-cyan-300 text-black'}`}>
-      {/* Conditionally render the Header */}
-      {!isLandingPage && <Header darkMode={darkMode} setDarkMode={setDarkMode} />}
+    <div
+      className={`flex flex-col min-h-screen ${
+        darkMode ? "bg-black text-white" : "bg-cyan-300 text-black"
+      }`}
+    >
+      {!isLandingPage && (
+        <Header darkMode={darkMode} setDarkMode={setDarkMode} />
+      )}
 
-      {/* Main content with flex-grow to push the footer to the bottom */}
       <main className="flex-grow pt-20">
         <div className="container mx-auto">
+          {/* <p>{message}</p> */}
+
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route
               path="/select-body-part"
               element={
                 <SelectedBodyPart
                   selectedBodyPart={selectedBodyPart}
                   setSelectedBodyPart={setSelectedBodyPart}
-                  difficulty={difficulty} // Pass difficulty state to SelectedBodyPart
-                  setDifficulty={setDifficulty} // Pass setDifficulty function
                   myExercises={myExercises}
                   setMyExercises={setMyExercises}
                   addedExercises={addedExercises}
                   setAddedExercises={setAddedExercises}
                   loading={loading}
                   setLoading={setLoading}
+                  setSearch={setSearch} // Pass setSearch here
                 />
               }
             />
+
             <Route
               path="/my-exercises"
               element={
@@ -108,8 +139,16 @@ const RoutesWrapper = ({
                 />
               }
             />
-            
-          <Route path="/health-hub" element={<HealthHub />} />
+            <Route
+              path="/my-exercises"
+              element={
+                <MyExercises
+                  myExercises={myExercises}
+                  setMyExercises={setMyExercises}
+                />
+              }
+            />
+            <Route path="/health-hub" element={<HealthHub />} />
           </Routes>
         </div>
       </main>

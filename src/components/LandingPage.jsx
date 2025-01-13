@@ -46,8 +46,12 @@ const LandingPage = () => {
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-3xl font-bold">FitQuest</h1>
           <div>
-            <Link to="/select-body-part" className="text-lg font-semibold hover:text-teal-300 transition duration-300">
-              Get Started
+            {/* <Link to="/login" className="text-lg font-semibold hover:text-teal-300 transition duration-300">
+              Login
+            </Link> */}
+            {/* <span className="mx-2 text-white">|</span> */}
+            <Link to="/register" className="text-lg font-semibold hover:text-teal-300 transition duration-300">
+              Register
             </Link>
           </div>
         </div>
@@ -75,15 +79,6 @@ const LandingPage = () => {
               ))}
             </div>
           </DndContext>
-
-          <div className="flex justify-center">
-            <Link
-              to="/select-body-part"
-              className="bg-teal-500 text-white px-6 py-3 rounded-lg text-xl font-semibold hover:bg-teal-600 transition duration-300"
-            >
-              Get Started
-            </Link>
-          </div>
         </motion.div>
       </main>
     </div>
