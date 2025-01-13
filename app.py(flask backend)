@@ -1,0 +1,138 @@
+from flask import Flask, request, jsonify
+from flask_mysqldb import MySQL
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_cors import CORS
+import joblib
+import numpy as np
+
+# Initialize Flask app and extensions
+app = Flask(__name__)
+
+# Enable CORS for all domains
+CORS(app)
+
+# MySQL Configuration
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'  # Your MySQL username
+app.config['MYSQL_PASSWORD'] = 'Pramit123'  # Your MySQL password
+app.config['MYSQL_DB'] = 'fitness_app'  # Your MySQL database name
+
+# Add a secret key for Flask and JWT
+app.config['SECRET_KEY'] = 'b9f875a3021bdb7ac41a4d3c8ad98302'  
+
+# Initialize extensions
+mysql = MySQL(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
+# Load the trained Multiple Linear Regression model
+model = joblib.load('calorie_burn_model.pkl')
+
+# Home route
+@app.route('/')
+def home():
+    return jsonify(message="Welcome to the Fitness Tracker API")
+
+# Register route
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.json.get('username', '')
+    password = request.json.get('password', '')
+
+    # Validate the input
+    if not username or not password:
+        return jsonify(message="Username and password are required"), 400
+
+    # Check if username exists
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    existing_user = cursor.fetchone()
+    if existing_user:
+        return jsonify(message="Username already exists"), 400
+
+    # Hash password and store in the database
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+    mysql.connection.commit()
+
+    return jsonify(message="User created successfully"), 201
+
+# Login route
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.json.get('username', '')
+    password = request.json.get('password', '')
+
+    # Validate the input
+    if not username or not password:
+        return jsonify(message="Username and password are required"), 400
+
+    # Check if the user exists
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    user = cursor.fetchone()
+
+    if user is None or not bcrypt.check_password_hash(user[2], password):
+        return jsonify(message="Invalid username or password"), 401
+
+    # Create JWT token
+    access_token = create_access_token(identity=user[0])  # user[0] is the user ID
+    return jsonify(access_token=access_token)
+
+# Calorie Burn Prediction route
+@app.route('/calculate-calories', methods=['POST'])
+def calculate_calories():
+    try:
+        # Get the JSON data from the request
+        data = request.get_json()
+
+        # Extract values from the request data
+        weight = data.get('weight')
+        exercise_type = data.get('exercise_type')
+        duration = data.get('duration')
+        reps = data.get('reps')
+
+        # Ensure all required values are present
+        if not weight or not duration or not reps:
+            return jsonify({"msg": "Missing required parameters"}), 400
+
+        # Predict calories burned using the model
+        calories_burned = calculate_burned_calories(weight, duration, reps)
+
+        # Return the result
+        return jsonify({"calories_burned": calories_burned})
+
+    except Exception as e:
+        return jsonify({"msg": str(e)}), 500
+
+
+def calculate_burned_calories(weight, duration, reps):
+    try:
+        # Use the ML model to predict calories burned
+        input_features = np.array([[weight, duration, reps]])
+        calories_burned = model.predict(input_features)
+        return calories_burned[0]
+
+    except Exception as e:
+        # Basic fallback logic if the model fails
+        print("Model prediction failed. Using fallback logic.", e)
+        return weight * 0.04 * duration  # Simplified fallback formula
+
+
+
+# Protected route (example)
+@app.route('/dashboard', methods=['GET'])
+@jwt_required()
+def dashboard():
+    current_user = get_jwt_identity()
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = %s", (current_user,))
+    user = cursor.fetchone()
+
+    return jsonify(message="Welcome to your dashboard", user=user)
+
+# Run the app
+if __name__ == "__main__":
+    app.run(debug=True)
